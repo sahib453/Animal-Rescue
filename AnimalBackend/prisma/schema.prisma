@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model animal_requests {
+  request_id         Int      @id @default(autoincrement())
+  user_phone         String?  @db.VarChar(20)   
+  image_url          String
+  address            String?  @default("")
+  injury_description String
+  animal_type        String   @db.VarChar(50)
+  org_name           String?  @db.VarChar(255)
+  request_status     Boolean? @default(false)
+  ngo                ngo?     @relation(fields: [org_name], references: [org_name], onDelete: NoAction, onUpdate: NoAction)
+  users              users?   @relation(fields: [user_phone], references: [phone], onDelete: Cascade, onUpdate: NoAction) 
+}
+
+model ngo {
+  org_name        String            @id @db.VarChar(255)
+  phone           String            @db.VarChar(20)
+  email           String            @unique @db.VarChar(255)
+  fixed_address   String
+  working_hours   String            @db.VarChar(50)
+  upi_id          String            @db.VarChar(255)
+  password        String            @db.VarChar(255)
+  animal_requests animal_requests[]
+}
+
+model users {
+  email           String            @id @db.VarChar(255)
+  name            String            @db.VarChar(255)
+  phone           String            @unique @db.VarChar(20)
+  address         String
+  password        String            @db.VarChar(255)
+  animal_requests animal_requests[]
+}
